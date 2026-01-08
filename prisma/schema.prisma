@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Mood {
+  happy
+  neutral
+  sad
+  angry
+}
+
+enum Status {
+  idea
+  planned
+  in_progress
+  shipped
+  closed
+}
+
+enum Platform {
+  ios
+  android
+  web
+}
+
+model Board {
+  id           String     @id @default(uuid())
+  slug         String     @unique
+  name         String
+  description  String
+  appStoreUrl  String?
+  playStoreUrl String?
+  createdAt    DateTime   @default(now())
+  feedback     Feedback[]
+}
+
+model Feedback {
+  id          String    @id @default(uuid())
+  boardId     String
+  board       Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  title       String
+  body        String
+  mood        Mood
+  status      Status    @default(idea)
+  isHidden    Boolean   @default(false)
+  platform    Platform?
+  appVersion  String?
+  upvoteCount Int       @default(0)
+  createdAt   DateTime  @default(now())
+  upvotes     Upvote[]
+
+  @@index([boardId])
+}
+
+model Upvote {
+  id         String   @id @default(uuid())
+  feedbackId String
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  voterHash  String
+  ipHash     String
+  createdAt  DateTime @default(now())
+
+  @@unique([feedbackId, voterHash])
+  @@index([voterHash])
+}
