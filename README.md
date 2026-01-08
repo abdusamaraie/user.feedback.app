@@ -21,8 +21,8 @@ A secure, anonymous feedback board for mobile app releases. Built with Next.js 1
 4. Run Prisma migrations and seed data:
    ```bash
    npm run prisma:migrate
-   npm run prisma:generate
-   npm run prisma:seed
+    npm run prisma:generate
+    npm run prisma:seed
    ```
 5. Start the dev server:
    ```bash
@@ -39,7 +39,7 @@ Visit `http://localhost:3000/b/launch-v1` for the sample board.
    - Supabase: set `DATABASE_URL` to the pooled connection string and `DIRECT_URL` to the direct connection string.
 5. Run migrations in your deployment pipeline:
    ```bash
-   npx prisma migrate deploy
+   npm run prisma:migrate:deploy
    ```
 
 ## Admin auth
