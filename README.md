@@ -39,7 +39,7 @@ Roles:
 - `DATABASE_URL`: Postgres connection string (Neon/Supabase supported)
 - `PAYLOAD_SECRET`: secret key for Payload
 - `NEXT_PUBLIC_SITE_URL`: base site URL (used for delete links)
-- `IP_HASH_SALT`: salt for hashing IPs for abuse protection
+- `HASH_SALT`: salt for hashing IPs for abuse protection
 - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`: optional rate limiting store
 
 ## Deployment (Vercel)

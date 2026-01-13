@@ -2,5 +2,9 @@ node_modules
 .next
 .env
 .env.local
-*.log
 payload-types.ts
+prisma/dev.db
+*.log
+
+.DS_Store
+package-lock.json
