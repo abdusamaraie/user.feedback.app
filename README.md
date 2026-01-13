@@ -1,60 +1,59 @@
-# Feedback Board MVP
+# Feedback Board
 
-A secure, anonymous feedback board for mobile app releases. Built with Next.js 15, Prisma, and Postgres.
+Anonymous feedback board platform built with Next.js, Payload CMS, and PostgreSQL.
 
 ## Features
-- Public boards per app release with search, sorting, and pagination.
-- Anonymous feedback submissions with mood tags.
-- Guest upvotes with fingerprint + IP hashing.
-- Admin dashboard protected by Basic Auth.
-- Rate limiting (Upstash Redis optional fallback).
-- Honeypot + minimum form fill time to deter bots.
 
-## Local setup
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Copy `.env.example` to `.env` and set values.
-3. Create your database (Neon or Supabase) and update `DATABASE_URL`.
-   - For Supabase: use the pooled connection string for `DATABASE_URL` and the direct connection string for `DIRECT_URL`.
-4. Run Prisma migrations and seed data:
-   ```bash
-   npm run prisma:migrate
-    npm run prisma:generate
-    npm run prisma:seed
-   ```
-5. Start the dev server:
-   ```bash
-   npm run dev
-   ```
+- Multi-app feedback boards with public browsing and filters.
+- Anonymous submissions + upvoting with device fingerprint cookies.
+- Payload admin dashboard for triage, tags, statuses, and pinned posts.
+- Rate limiting with Upstash Redis (with in-memory fallback for local dev).
 
-Visit `http://localhost:3000/b/launch-v1` for the sample board.
+## Tech Stack
 
-## Deploy to Vercel
-1. Push the repo to GitHub.
-2. Create a new Vercel project and import the repo.
-3. Add environment variables from `.env.example`.
-4. Use the Vercel Postgres integration or a Neon/Supabase database.
-   - Supabase: set `DATABASE_URL` to the pooled connection string and `DIRECT_URL` to the direct connection string.
-5. Run migrations in your deployment pipeline:
-   ```bash
-   npm run prisma:migrate:deploy
-   ```
+- Next.js App Router + TypeScript
+- Payload CMS (admin at `/admin`)
+- PostgreSQL (Neon/Supabase compatible)
+- Tailwind CSS
 
-## Admin auth
-The `/admin` routes are protected by Basic Auth using the `ADMIN_PASSWORD` env variable.
-Use username `admin` and the configured password.
+## Local Development
 
-## Database schema
-The Prisma schema is in `prisma/schema.prisma`. Migrations live in `prisma/migrations`.
+1. Copy `.env.example` to `.env` and update values.
+2. Install dependencies and run dev:
 
-## Tests
-Run unit tests:
 ```bash
-npm run test
+npm install
+npm run dev
 ```
 
+3. Optional seed data:
+
+```bash
+npm run seed
+```
+
+## Public Endpoints
+
+- `POST /api/public/fingerprint` – ensures fingerprint cookie
+- `POST /api/public/posts` – submit feedback
+- `POST /api/public/votes` – upvote (one per fingerprint per post)
+- `POST /api/public/posts/delete` – delete with token
+- `GET /api/public/posts?boardId=...` – list posts
+
+## Vercel Deployment
+
+1. Create a Postgres database (Neon/Supabase).
+2. Set environment variables:
+   - `DATABASE_URL`
+   - `PAYLOAD_SECRET`
+   - `NEXT_PUBLIC_SITE_URL`
+   - `IP_HASH_SALT`
+   - `UPSTASH_REDIS_REST_URL` (optional)
+   - `UPSTASH_REDIS_REST_TOKEN` (optional)
+3. Deploy to Vercel. Payload routes are configured for the Node runtime.
+
 ## Notes
-- Rate limiting uses Upstash Redis when configured; otherwise it falls back to an in-memory limiter (not recommended for production).
-- Feedback content is stored as plain text and rendered safely by React.
+
+- File uploads are disabled. Posts are stored in PostgreSQL only.
+- Votes are unique on `(post, fingerprint)` to prevent duplicates.
+
