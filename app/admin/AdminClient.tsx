@@ -30,6 +30,10 @@ export default function AdminClient({ boards }: { boards: Board[] }) {
     const formData = new FormData(event.currentTarget);
     const payload = Object.fromEntries(formData.entries());
 
+    // capture the form element synchronously — React's synthetic event is pooled and
+    // will be null after an `await`, so we store a reference before using it later
+    const form = event.currentTarget;
+
     const response = await fetch('/api/admin/boards', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -38,7 +42,7 @@ export default function AdminClient({ boards }: { boards: Board[] }) {
 
     if (response.ok) {
       setMessage('Board created. Refresh to see it in the list.');
-      event.currentTarget.reset();
+      form.reset();
     } else {
       setMessage('Unable to create board.');
     }

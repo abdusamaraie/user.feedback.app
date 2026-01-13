@@ -12,7 +12,8 @@ export function getRequestIp(request: NextRequest) {
   if (forwarded) {
     return forwarded.split(',')[0]?.trim() ?? 'unknown';
   }
-  return request.ip ?? 'unknown';
+  // `NextRequest` does not expose `ip`; default to 'unknown' if header is not present
+  return 'unknown';
 }
 
 export function getFingerprint(request: NextRequest) {

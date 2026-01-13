@@ -14,20 +14,25 @@ export default async function BoardPage({
   params,
   searchParams
 }: {
-  params: { slug: string };
-  searchParams: { q?: string; sort?: string; page?: string };
+  // Next's generated types expect Promise-wrapped `params` and `searchParams` in
+  // the app router's inferred `PageProps` type, so declare them as Promises.
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ q?: string; sort?: string; page?: string }>;
 }) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+
   const board = await prisma.board.findUnique({
-    where: { slug: params.slug }
+    where: { slug: resolvedParams.slug }
   });
 
   if (!board) {
     return notFound();
   }
 
-  const page = Number(searchParams.page ?? '1');
-  const query = searchParams.q?.trim();
-  const sort = searchParams.sort === 'top' ? 'top' : 'new';
+  const page = Number(resolvedSearchParams?.page ?? '1');
+  const query = resolvedSearchParams?.q?.trim();
+  const sort = resolvedSearchParams?.sort === 'top' ? 'top' : 'new';
 
   const where = {
     boardId: board.id,
@@ -52,7 +57,7 @@ export default async function BoardPage({
     prisma.feedback.count({ where })
   ]);
 
-  const cookie = cookies().get('fp');
+  const cookie = (await cookies()).get('fp');
   const voterHash = cookie ? hashValue(cookie.value) : null;
   const upvotes = voterHash
     ? await prisma.upvote.findMany({
